@@ -255,6 +255,9 @@
           </van-button>
         </div>
         <div v-if="showTotalGoal" id="chart_total_goal" class="chart" style="height: 300px"></div>
+        <div class="flex w-full m-4 px-2">
+          <van-button type="primary" class="grow" @click="onScreenShot">保存比赛截图</van-button>
+        </div>
       </div>
     </van-pull-refresh>
     <van-popup v-model:show="showOdds" position="bottom" round close-on-popstate>
@@ -280,16 +283,17 @@ import { onBeforeUnmount, onMounted, ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import * as echarts from "echarts"
 import _ from "lodash"
+import { useLocalStorage } from "@vueuse/core"
+import { VxeTablePropTypes } from "vxe-table"
+import { domToJpeg } from "modern-screenshot"
+import OddsList from "@/pages/detail/src/OddsList.vue"
+import MatchingList from "@/pages/detail/src/MatchingList.vue"
+import TrendList from "@/pages/detail/src/TrendList.vue"
 import { analysisMatch, getGithubToken, getMatchInfo } from "@/http/api/football.ts"
 import { IMatchInfo } from "@/models/match.ts"
 import { closeToast, showLoadingToast, showToast } from "vant"
 import { defineChartOption, defineTeamStatusChartOption, defineTotalGoalChartOption, getDecimalPoint } from "@/utils/tools.ts"
-import OddsList from "@/pages/detail/src/OddsList.vue"
-import MatchingList from "@/pages/detail/src/MatchingList.vue"
-import TrendList from "@/pages/detail/src/TrendList.vue"
 import { useMatchStore } from "@/store/currentMatch.ts"
-import { useLocalStorage } from "@vueuse/core"
-import { VxeTablePropTypes } from "vxe-table"
 
 defineOptions({
   name: "MatchDetail"
@@ -751,6 +755,22 @@ const addHistoryMatch = (match: IMatchInfo) => {
     historyMatches.value.pop()
   }
 }
+const onScreenShot = () => {
+  showLoadingToast("保存截图中...")
+  setTimeout(async () => {
+    const dataUrl = await domToJpeg(<Node>document.querySelector(".content-container"), {
+      filter(el:Node) {
+        // @ts-ignore
+        return !(el.classList?.contains('van-button'))
+      }
+    })
+    const link = document.createElement('a')
+    link.download = `${matchStore.match.match_group} ${matchStore.match.home_team}vs${matchStore.match.visit_team}.jpeg`
+    link.href = dataUrl
+    link.click()
+    closeToast()
+  })
+}
 </script>
 
 <style lang="less" scoped>
@@ -759,6 +779,7 @@ const addHistoryMatch = (match: IMatchInfo) => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: #f8f8f8;
 }
 
 .match-group {
