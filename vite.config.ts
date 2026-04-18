@@ -24,7 +24,7 @@ export default defineConfig({
     }
   },
   // base: process.env.NODE_ENV === 'production' ? "/" : "./",
-  base: './';
+  base: './',
   server: {
     host: '0.0.0.0',
     port: 8080,
