@@ -23,7 +23,8 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src')
     }
   },
-  base: process.env.NODE_ENV === 'production' ? "/" : "./",
+  // base: process.env.NODE_ENV === 'production' ? "/" : "./",
+  base: './';
   server: {
     host: '0.0.0.0',
     port: 8080,
@@ -32,7 +33,7 @@ export default defineConfig({
       '/api': {
         target: 'http://127.0.0.1:10008',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        rewrite: (path) => path.replace(/^\/api/， '')
       }
     }
   },
